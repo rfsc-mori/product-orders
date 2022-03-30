@@ -1,17 +1,17 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, ManyToOne, JoinColumn } from "typeorm";
+import { Entity, Column, ManyToMany, ManyToOne, JoinColumn, PrimaryColumn } from "typeorm";
 import { TimestampTrackedEntity } from "../base/timestampTracked.entity";
 import { Order } from "../order/order.entity";
 import { Category } from "../category/category.entity";
 
 @Entity()
 export class Product extends TimestampTrackedEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryColumn({ length: 32 })
+  id: string;
 
   @Column({ length: 255, nullable: false })
   title: string;
 
-  @Column('decimal', { precision: 10, scale: 4, nullable: false })
+  @Column('decimal', { precision: 15, scale: 4, nullable: true })
   price: number;
 
   @Column({ nullable: false })
