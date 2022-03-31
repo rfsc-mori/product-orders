@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { Category } from "./category.entity";
+import { CategoryEntity } from "./category.entity";
+import { CreateCategoryDto } from "./dto";
 
 @Injectable()
 export class CategoriesService {
   constructor(
-    @InjectRepository(Category)
-    private usersRepository: Repository<Category>,
+    @InjectRepository(CategoryEntity)
+    private categoryRepository: Repository<CategoryEntity>,
   ) {}
 }

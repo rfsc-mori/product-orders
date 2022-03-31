@@ -1,9 +1,9 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from "typeorm";
 import { TimestampTrackedEntity } from "../base/timestampTracked.entity";
-import { Order } from "../order/order.entity";
+import { OrderEntity } from "../order/order.entity";
 
-@Entity()
-export class User extends TimestampTrackedEntity {
+@Entity('user')
+export class UserEntity extends TimestampTrackedEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -16,6 +16,6 @@ export class User extends TimestampTrackedEntity {
   @Column('binary', { length: 60, nullable: false })
   password: Buffer;
 
-  @OneToMany(type => Order, order => order.user)
-  orders: Order[];
+  @OneToMany(type => OrderEntity, order => order.user)
+  orders: OrderEntity[];
 }

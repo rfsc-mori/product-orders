@@ -1,10 +1,10 @@
 import { Entity, Column, ManyToMany, ManyToOne, JoinColumn, PrimaryColumn } from "typeorm";
 import { TimestampTrackedEntity } from "../base/timestampTracked.entity";
-import { Order } from "../order/order.entity";
-import { Category } from "../category/category.entity";
+import { OrderEntity } from "../order/order.entity";
+import { CategoryEntity } from "../category/category.entity";
 
-@Entity()
-export class Product extends TimestampTrackedEntity {
+@Entity('product')
+export class ProductEntity extends TimestampTrackedEntity {
   @PrimaryColumn({ length: 32 })
   id: string;
 
@@ -17,12 +17,12 @@ export class Product extends TimestampTrackedEntity {
   @Column({ nullable: false })
   available_quantity: number;
 
-  @ManyToOne(type => Category, category => category.products, {
+  @ManyToOne(type => CategoryEntity, category => category.products, {
     nullable: false
   })
   @JoinColumn({ name: 'category_id' })
-  category: Category;
+  category: CategoryEntity;
 
-  @ManyToMany(type => Order, order => order.products)
-  orders: Order[];
+  @ManyToMany(type => OrderEntity, order => order.products)
+  orders: OrderEntity[];
 }
