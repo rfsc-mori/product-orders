@@ -10,4 +10,17 @@ export class CategoriesService {
     @InjectRepository(CategoryEntity)
     private categoryRepository: Repository<CategoryEntity>,
   ) {}
+
+  count() {
+    return this.categoryRepository.count();
+  }
+
+  create(categoryDto: CreateCategoryDto) {
+    let category = new CategoryEntity();
+    category.id = categoryDto.id;
+    category.name = categoryDto.name;
+    category.products = [];
+
+    return this.categoryRepository.save(category);
+  }
 }
