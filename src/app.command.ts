@@ -54,10 +54,11 @@ export class AppCommand {
       .toString();
 
     // items | query: category=${category}&limit=${limit}
-    const searchUrl = (categoryId) => url()
+    const searchUrl = (categoryId, offset, count) => url()
       .addPath('search')
       .addQuery('category', categoryId)
-      .addQuery('limit', productCount) // For simplicity pages are not handled.
+      .addQuery('limit', count) // For simplicity pages are not handled.
+      .addQuery('offset', offset)
       .toString();
 
     const fetchCategories = async () => {
@@ -77,8 +78,8 @@ export class AppCommand {
       return schema.validate(await body.json());
     };
 
-    const fetchProducts = async (categoryId) => {
-      const { statusCode, body } = await request(searchUrl(categoryId));
+    const fetchProducts = async (categoryId, offset, count) => {
+      const { statusCode, body } = await request(searchUrl(categoryId, offset, count));
 
       if (statusCode != 200) {
         throw new Error(`Error requesting products.\nStatus code: ${statusCode}\nBody: ${body}`);
@@ -113,10 +114,14 @@ export class AppCommand {
       for (const category of categories) {
         console.log(`Loading products from '${category.name}'...`);
 
-        const products = await fetchProducts(category.id);
+        // Workaround: Request a longer list of items and slice the array to accommodate for gaps in the API results.
+        const limitModifier = 5;
+        let products = await fetchProducts(category.id, 0, productCount * limitModifier);
 
-        if (products.length < productCount) {
-          console.warn(`Warning: Category '${category.name}' has less than ${productCount} products.`);
+        if (products.length >= productCount) {
+          products = products.slice(0, productCount);
+        } else {
+          console.warn(`Warning: Received less than ${productCount} products for category '${category.name}'.`);
         }
 
         // Assuming the API is consistent it is safe to start saving categories and products from now on.
