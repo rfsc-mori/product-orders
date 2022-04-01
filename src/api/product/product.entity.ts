@@ -28,6 +28,10 @@ export class ProductEntity extends TimestampTrackedEntity {
   @JoinColumn({ name: 'category_id' })
   category: CategoryEntity;
 
+  // id for category field (see above)
+  @Column({ name: 'category_id', nullable: false, length: 32 })
+  categoryId: string;
+
   @ManyToMany(type => OrderEntity, order => order.products)
   orders: OrderEntity[];
 }

@@ -12,8 +12,8 @@ export class ProductsController {
   @Get('products')
   async products(@Query('category_id') categoryId: string) {
     if (!categoryId || categoryId.length == 0) {
-      const errors = { category_id: 'The category id cannot be empty.' };
-      throw new HttpException({ message: 'Failed to list products.', errors }, HttpStatus.BAD_REQUEST);
+      const errors = {category_id: 'The category id cannot be empty.'};
+      throw new HttpException({message: 'Failed to list products.', errors}, HttpStatus.BAD_REQUEST);
     }
 
     return this.productsService.findViewsByCategory(categoryId);
@@ -23,8 +23,8 @@ export class ProductsController {
   @Get('product')
   async product(@Query('id') id: string) {
     if (!id || id.length == 0) {
-      const errors = { id: 'The product id cannot be empty.' };
-      throw new HttpException({ message: 'Failed to list products.', errors }, HttpStatus.BAD_REQUEST);
+      const errors = {id: 'The product id cannot be empty.'};
+      throw new HttpException({message: 'Failed to list products.', errors}, HttpStatus.BAD_REQUEST);
     }
 
     return this.productsService.findViewById(id);
@@ -34,8 +34,8 @@ export class ProductsController {
   @Get(ProductsController.categoriesPath() + '/:categoryId/prices')
   async prices(@Param('categoryId') categoryId: string) {
     if (!categoryId || categoryId.length == 0) {
-      const errors = { categoryId: 'The category id cannot be empty.' };
-      throw new HttpException({ message: 'Failed to list products.', errors }, HttpStatus.BAD_REQUEST);
+      const errors = {categoryId: 'The category id cannot be empty.'};
+      throw new HttpException({message: 'Failed to list products.', errors}, HttpStatus.BAD_REQUEST);
     }
 
     return this.productsService.findViewsByCategory(categoryId, { price: 'ASC' });

@@ -18,13 +18,20 @@ export class CategoriesService {
     return this.categoryRepository.count();
   }
 
-  async findViewByName(name: string) {
-    const categories = await this.findViewsByNames([name]);
-    return categories[0];
+  async categoryExists(categoryId: string) {
+    const categoryCount = await this.categoryRepository.count({ id: categoryId });
+    return (categoryCount > 0);
+  }
+
+  async ensureCategoryExists(categoryId: string) {
+    if (!await this.categoryExists(categoryId)) {
+      const errors = {id: 'The specified category does not exist.'};
+      throw new HttpException({message: 'Resource not found.', errors}, HttpStatus.NOT_FOUND);
+    }
   }
 
   async findViewsByNames(names: string[]) {
-    const categories = await this.getCategoriesByName(names);
+    const categories = await this.getCategoryEntitiesByName(names);
     return categories.map(CategoriesService.buildCategoryView);
   }
 
@@ -38,35 +45,6 @@ export class CategoriesService {
     await CategoriesService.validateCategory(category);
 
     return this.categoryRepository.save(category);
-  }
-
-  async saveEntity(categoryEntity: CategoryEntity) {
-    await CategoriesService.validateCategory(categoryEntity);
-
-    return this.categoryRepository.save(categoryEntity);
-  }
-
-  async categoryExists(categoryId: string) {
-    const categoryCount = await this.categoryRepository.count({ id: categoryId });
-    return (categoryCount > 0);
-  }
-
-  findCategoryById(categoryId: string, relations?: string[]) {
-    return this.categoryRepository.findOne({
-      where: { id: categoryId },
-      relations: relations
-    });
-  }
-
-  async getCategoryById(categoryId: string, relations?: string[]) {
-    const category = await this.findCategoryById(categoryId, relations);
-
-    if (!category) {
-      const errors = { categoryId: 'The specified category does not exist.' };
-      throw new HttpException({ message: 'Failed to create product.', errors }, HttpStatus.BAD_REQUEST);
-    }
-
-    return category;
   }
 
   public static buildCategoryView(category: CategoryEntity): CategoryView {
@@ -84,11 +62,11 @@ export class CategoriesService {
     }
   }
 
-  private async getCategoriesByName(names: string[]) {
+  private async getCategoryEntitiesByName(names: string[]) {
     const categories = await this.categoryRepository.find({ name: In(names) });
 
     if (categories.length < names.length) {
-      const errors = {id: 'One or more of the specified resources don\'t exist.'};
+      const errors = {id: 'One or more of the specified categories don\'t exist.'};
       throw new HttpException({message: 'Resource not found.', errors}, HttpStatus.NOT_FOUND);
     }
 

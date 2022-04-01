@@ -14,17 +14,41 @@ export class UsersService {
     private readonly usersRepository: Repository<UserEntity>,
   ) {}
 
+  async userExistsById(id: number) {
+    const emailCount = await this.usersRepository.count({ id: id });
+    return (emailCount > 0);
+  }
+
+  async ensureUserExistsById(id: number) {
+    if (!await this.userExistsById(id)) {
+      const errors = {id: 'The specified user does not exist.'};
+      throw new HttpException({message: 'Resource not found.', errors}, HttpStatus.NOT_FOUND);
+    }
+  }
+
+  async userExistsByEmail(email: string) {
+    const emailCount = await this.usersRepository.count({ email: email });
+    return (emailCount > 0);
+  }
+
+  async ensureUserExistsByEmail(email: string) {
+    if (!await this.userExistsByEmail(email)) {
+      const errors = {id: 'The specified user does not exist.'};
+      throw new HttpException({message: 'Resource not found.', errors}, HttpStatus.NOT_FOUND);
+    }
+  }
+
   findEntityByEmail(email: string) {
     return this.usersRepository.findOne({ email: email });
   }
 
   async findViewById(id: number) {
-    const user = await this.getUserById(id);
+    const user = await this.getUserEntityById(id);
     return UsersService.buildUserView(user);
   }
 
   async create(userDto: CreateUserDto) {
-    if (await this.userExists(userDto.email)) {
+    if (await this.userExistsByEmail(userDto.email)) {
       const errors = {email: 'The email must be unique.'};
       throw new HttpException({message: 'Input data validation failed.', errors}, HttpStatus.CONFLICT);
     }
@@ -42,6 +66,17 @@ export class UsersService {
     return UsersService.buildUserView(userEntity);
   }
 
+  async getUserEntityById(id: number) {
+    const user = await this.usersRepository.findOne({ id: id });
+
+    if (!user) {
+      const errors = {id: 'The specified user does not exist.'};
+      throw new HttpException({message: 'Resource not found.', errors}, HttpStatus.NOT_FOUND);
+    }
+
+    return user;
+  }
+
   public static buildUserView(user: UserEntity): UserView {
     return {
       id: user.id,
@@ -56,21 +91,5 @@ export class UsersService {
     if (errors.length > 0) {
       throw new HttpException({message: 'Input data validation failed.', errors: errors}, HttpStatus.BAD_REQUEST);
     }
-  }
-
-  private async userExists(email: string) {
-    const emailCount = await this.usersRepository.count({ email: email });
-    return (emailCount > 0);
-  }
-
-  private async getUserById(id: number) {
-    const user = await this.usersRepository.findOne({ id: id });
-
-    if (!user) {
-      const errors = {id: 'The specified user does not exist.'};
-      throw new HttpException({message: 'Resource not found.', errors}, HttpStatus.NOT_FOUND);
-    }
-
-    return user;
   }
 }
