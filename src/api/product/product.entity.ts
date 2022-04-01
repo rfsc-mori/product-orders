@@ -2,13 +2,18 @@ import { Entity, Column, ManyToMany, ManyToOne, JoinColumn, PrimaryColumn } from
 import { TimestampTrackedEntity } from "../base/timestampTracked.entity";
 import { OrderEntity } from "../order/order.entity";
 import { CategoryEntity } from "../category/category.entity";
+import { IsNotEmpty, MaxLength } from "class-validator";
 
 @Entity('product')
 export class ProductEntity extends TimestampTrackedEntity {
   @PrimaryColumn({ length: 32 })
+  @IsNotEmpty()
+  @MaxLength(32)
   id: string;
 
   @Column({ length: 255, nullable: false })
+  @IsNotEmpty()
+  @MaxLength(255)
   title: string;
 
   @Column('decimal', { precision: 15, scale: 4, nullable: true })

@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { ProductEntity } from "./product.entity";
 import { CreateProductDto } from "./dto";
 import { CategoryEntity } from "../category/category.entity";
+
+import { validate } from "class-validator";
 
 @Injectable()
 export class ProductsService {
@@ -19,7 +21,7 @@ export class ProductsService {
   }
 
   async create(categoryId: string, productDto: CreateProductDto) {
-    const category = await this.findCategory(categoryId);
+    const category = await this.getCategory(categoryId);
     const productEntity = await this.createProductOnly(category, productDto);
 
     category.products.push(productEntity);
@@ -30,7 +32,7 @@ export class ProductsService {
   }
 
   async createMany(categoryId: string, productDtoList: CreateProductDto[]) {
-    const category = await this.findCategory(categoryId);
+    const category = await this.getCategory(categoryId);
 
     const products = productDtoList.map((productDto) => {
       return this.createProductOnly(category, productDto);
@@ -43,7 +45,7 @@ export class ProductsService {
     await this.categoryRepository.save(category);
   }
 
-  private createProductOnly(category: CategoryEntity, productDto: CreateProductDto) {
+  private async createProductOnly(category: CategoryEntity, productDto: CreateProductDto) {
     let product = new ProductEntity();
     product.id = productDto.id;
     product.title = productDto.title;
@@ -52,13 +54,26 @@ export class ProductsService {
 
     product.category = category;
 
+    const productErrors = await validate(product);
+
+    if (productErrors.length > 0) {
+      throw new HttpException({message: 'Input data validation failed.', errors: productErrors}, HttpStatus.BAD_REQUEST);
+    }
+
     return this.productRepository.save(product);
   }
 
-  private findCategory(categoryId: string) {
-    return this.categoryRepository.findOne({
+  private getCategory(categoryId: string) {
+    const category = this.categoryRepository.findOne({
       where: { id: categoryId },
       relations: ['products']
     });
+
+    if (!category) {
+      const errors = { categoryId: 'The specified category does not exist.' };
+      throw new HttpException({ message: 'Failed to create product.', errors }, HttpStatus.BAD_REQUEST);
+    }
+
+    return category;
   }
 }

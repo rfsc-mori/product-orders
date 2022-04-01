@@ -34,7 +34,7 @@ export class UsersService {
     const userErrors = await validate(user);
 
     if (userErrors.length > 0) {
-      throw new HttpException({message: 'Input data validation failed.', userErrors}, HttpStatus.BAD_REQUEST);
+      throw new HttpException({message: 'Input data validation failed.', errors: userErrors}, HttpStatus.BAD_REQUEST);
     }
 
     const userEntity = await this.usersRepository.save(user);
