@@ -17,7 +17,7 @@ export class ProductEntity extends TimestampTrackedEntity {
   title: string;
 
   @Column('decimal', { precision: 15, scale: 4, nullable: true })
-  price: number;
+  price: number; // The price is stored as a number for simplicity as no operations takes place.
 
   @Column({ nullable: false })
   available_quantity: number;

@@ -53,12 +53,12 @@ export class AppCommand {
       .addPath('categories')
       .toString();
 
-    // items | query: category=${category}&limit=${limit}
+    // items | query: category=${category}&offset=${offset}&limit=${limit}
     const searchUrl = (categoryId, offset, count) => url()
       .addPath('search')
       .addQuery('category', categoryId)
-      .addQuery('limit', count) // For simplicity pages are not handled.
       .addQuery('offset', offset)
+      .addQuery('limit', count) // For simplicity pages are not handled.
       .toString();
 
     const fetchCategories = async () => {

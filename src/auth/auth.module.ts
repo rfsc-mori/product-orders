@@ -23,7 +23,6 @@ import authConfig from "../config/auth.config";
       })
     })
   ],
-  exports: [AuthService],
   providers: [AuthService, LocalStrategy, JwtStrategy],
   controllers: [AuthController]
 })

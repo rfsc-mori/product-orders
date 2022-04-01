@@ -22,7 +22,7 @@
     "typeorm": "ts-node ./node_modules/typeorm/cli -f ./ormconfig.json",
     "migration:gen": "ts-node ./node_modules/typeorm/cli -f ./ormconfig.json migration:generate -d ./src/migrations -n",
     "migration:run": "ts-node ./node_modules/typeorm/cli -f ./ormconfig.json migration:run",
-    "db:populate": "npx nestjs-command db:populate"
+    "db:populate": "CLI_PATH=./dist/cli.js npx nestjs-command db:populate"
   },
   "dependencies": {
     "@innova2/url-builder": "^1.4.0",
@@ -37,8 +37,10 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2",
     "js-yaml": "^4.1.0",
+    "jsonwebtoken": "^8.5.1",
     "mysql2": "^2.3.3",
     "nestjs-command": "^3.1.1",
+    "parse-duration": "^1.0.2",
     "passport": "^0.5.2",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",

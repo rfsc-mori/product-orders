@@ -3,7 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { UserEntity } from "./user.entity";
 import { CreateUserDto } from "./dto";
-import { UserRO } from "./user.interface";
+import { UserView } from "./user.interface";
 
 import { validate } from "class-validator";
 
@@ -11,11 +11,16 @@ import { validate } from "class-validator";
 export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
-    private usersRepository: Repository<UserEntity>,
+    private readonly usersRepository: Repository<UserEntity>,
   ) {}
 
-  findOne(email: string) {
+  findEntityByEmail(email: string) {
     return this.usersRepository.findOne({ email: email });
+  }
+
+  async findViewById(id: number) {
+    const user = await this.getUserById(id);
+    return UsersService.buildUserView(user);
   }
 
   async create(userDto: CreateUserDto) {
@@ -31,17 +36,13 @@ export class UsersService {
 
     user.orders = [];
 
-    const userErrors = await validate(user);
-
-    if (userErrors.length > 0) {
-      throw new HttpException({message: 'Input data validation failed.', errors: userErrors}, HttpStatus.BAD_REQUEST);
-    }
+    await UsersService.validateUser(user);
 
     const userEntity = await this.usersRepository.save(user);
-    return UsersService.buildUserRO(userEntity);
+    return UsersService.buildUserView(userEntity);
   }
 
-  public static buildUserRO(user: UserEntity): UserRO {
+  public static buildUserView(user: UserEntity): UserView {
     return {
       id: user.id,
       name: user.name,
@@ -49,8 +50,27 @@ export class UsersService {
     };
   }
 
+  private static async validateUser(user: UserEntity) {
+    const errors = await validate(user);
+
+    if (errors.length > 0) {
+      throw new HttpException({message: 'Input data validation failed.', errors: errors}, HttpStatus.BAD_REQUEST);
+    }
+  }
+
   private async userExists(email: string) {
     const emailCount = await this.usersRepository.count({ email: email });
     return (emailCount > 0);
+  }
+
+  private async getUserById(id: number) {
+    const user = await this.usersRepository.findOne({ id: id });
+
+    if (!user) {
+      const errors = {id: 'The specified user does not exist.'};
+      throw new HttpException({message: 'Resource not found.', errors}, HttpStatus.NOT_FOUND);
+    }
+
+    return user;
   }
 }

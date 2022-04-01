@@ -2,47 +2,76 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { ProductEntity } from "./product.entity";
+import { ProductView } from "./product.interface";
 import { CreateProductDto } from "./dto";
 import { CategoryEntity } from "../category/category.entity";
+import { CategoriesService } from "../category/categories.service";
 
 import { validate } from "class-validator";
 
 @Injectable()
 export class ProductsService {
   constructor(
-    @InjectRepository(CategoryEntity)
-    private categoryRepository: Repository<CategoryEntity>,
     @InjectRepository(ProductEntity)
-    private productRepository: Repository<ProductEntity>,
+    private readonly productRepository: Repository<ProductEntity>,
+    private readonly categoriesService: CategoriesService,
   ) {}
 
   count() {
     return this.productRepository.count();
   }
 
+  async findViewById(id: string) {
+    const product = await this.getProductById(id);
+    return ProductsService.buildProductView(product);
+  }
+
+  async findViewsByCategory(categoryId: string, order?: object) {
+    if (!await this.categoriesService.categoryExists(categoryId)) {
+      const errors = { categoryId: 'The specified category does not exist.' };
+      throw new HttpException({ message: 'Failed to list products.', errors }, HttpStatus.NOT_FOUND);
+    }
+
+    const products = await this.productRepository.find({
+      where: { category: { id: categoryId } },
+      order: order
+    });
+
+    return products.map(ProductsService.buildProductView);
+  }
+
   async create(categoryId: string, productDto: CreateProductDto) {
-    const category = await this.getCategory(categoryId);
+    const category = await this.getCategoryById(categoryId);
     const productEntity = await this.createProductOnly(category, productDto);
 
     category.products.push(productEntity);
 
-    await this.categoryRepository.save(category);
+    await this.categoriesService.saveEntity(category);
 
-    return productEntity;
+    return ProductsService.buildProductView(productEntity);
   }
 
   async createMany(categoryId: string, productDtoList: CreateProductDto[]) {
-    const category = await this.getCategory(categoryId);
+    const category = await this.getCategoryById(categoryId);
 
     const products = productDtoList.map((productDto) => {
       return this.createProductOnly(category, productDto);
     });
 
+    let productViews = new Array(products.length);
+    let index = 0;
+
     for (const product of products) {
-      category.products.push(await product);
+      const productEntity = await product;
+
+      productViews[index++] = ProductsService.buildProductView(productEntity);
+
+      category.products.push(productEntity);
     }
 
-    await this.categoryRepository.save(category);
+    await this.categoriesService.saveEntity(category);
+
+    return productViews;
   }
 
   private async createProductOnly(category: CategoryEntity, productDto: CreateProductDto) {
@@ -54,26 +83,40 @@ export class ProductsService {
 
     product.category = category;
 
-    const productErrors = await validate(product);
-
-    if (productErrors.length > 0) {
-      throw new HttpException({message: 'Input data validation failed.', errors: productErrors}, HttpStatus.BAD_REQUEST);
-    }
+    await ProductsService.validateProduct(product);
 
     return this.productRepository.save(product);
   }
 
-  private getCategory(categoryId: string) {
-    const category = this.categoryRepository.findOne({
-      where: { id: categoryId },
-      relations: ['products']
-    });
+  public static buildProductView(product: ProductEntity): ProductView {
+    return {
+      id: product.id,
+      title: product.title,
+      price: product.price,
+      available_quantity: product.available_quantity,
+    };
+  }
 
-    if (!category) {
-      const errors = { categoryId: 'The specified category does not exist.' };
-      throw new HttpException({ message: 'Failed to create product.', errors }, HttpStatus.BAD_REQUEST);
+  private static async validateProduct(product: ProductEntity) {
+    const errors = await validate(product);
+
+    if (errors.length > 0) {
+      throw new HttpException({message: 'Input data validation failed.', errors: errors}, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  private async getCategoryById(categoryId: string) {
+    return this.categoriesService.getCategoryById(categoryId, ['products']);
+  }
+
+  private async getProductById(id: string) {
+    const product = await this.productRepository.findOne({ id: id });
+
+    if (!product) {
+      const errors = {id: 'The specified product does not exist.'};
+      throw new HttpException({message: 'Resource not found.', errors}, HttpStatus.NOT_FOUND);
     }
 
-    return category;
+    return product;
   }
 }

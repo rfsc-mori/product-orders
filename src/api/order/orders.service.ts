@@ -7,6 +7,6 @@ import { OrderEntity } from "./order.entity";
 export class OrdersService {
   constructor(
     @InjectRepository(OrderEntity)
-    private usersRepository: Repository<OrderEntity>,
+    private readonly usersRepository: Repository<OrderEntity>,
   ) {}
 }
