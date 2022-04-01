@@ -8,22 +8,17 @@ import { UsersModule } from "./api/user/users.module";
 import { CategoriesModule } from "./api/category/categories.module";
 import { ProductsModule } from "./api/product/products.module";
 import { OrdersModule } from "./api/order/orders.module";
-import { UsersController } from "./api/user/users.controller";
-import { CategoriesController } from "./api/category/categories.controller";
-import { ProductsController } from "./api/product/products.controller";
-import { OrdersController } from "./api/order/orders.controller";
-import { UsersService } from "./api/user/users.service";
-import { CategoriesService } from "./api/category/categories.service";
-import { ProductsService } from "./api/product/products.service";
-import { OrdersService } from "./api/order/orders.service";
 import { AppCommand } from "./app.command";
+import { AuthModule } from './auth/auth.module';
+
+import { getConnectionOptions } from "typeorm";
 
 import configuration from "./config/configuration";
-import { getConnectionOptions } from "typeorm";
 
 @Module({
   imports: [
     ConfigModule.forRoot({
+      isGlobal: true,
       load: [
         configuration,
       ]
@@ -39,8 +34,9 @@ import { getConnectionOptions } from "typeorm";
     ProductsModule,
     OrdersModule,
     CommandModule,
+    AuthModule,
   ],
-  controllers: [AppController, UsersController, CategoriesController, ProductsController, OrdersController],
-  providers: [AppService, UsersService, CategoriesService, ProductsService, OrdersService, AppCommand],
+  controllers: [AppController],
+  providers: [AppService, AppCommand],
 })
 export class AppModule {}

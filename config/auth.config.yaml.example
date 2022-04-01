@@ -1,0 +1,3 @@
+jwt:
+  secret: '{secret}'
+  expires: '1d'

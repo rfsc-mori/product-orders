@@ -1,6 +1,8 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, BeforeInsert } from "typeorm";
 import { TimestampTrackedEntity } from "../base/timestampTracked.entity";
 import { OrderEntity } from "../order/order.entity";
+
+import * as argon2 from 'argon2';
 
 @Entity('user')
 export class UserEntity extends TimestampTrackedEntity {
@@ -13,8 +15,13 @@ export class UserEntity extends TimestampTrackedEntity {
   @Column({ unique: true, length: 254, nullable: false })
   email: string;
 
-  @Column('binary', { length: 60, nullable: false })
-  password: Buffer;
+  @Column({ nullable: false })
+  password: string;
+
+  @BeforeInsert()
+  async hashPassword() {
+    this.password = await argon2.hash(this.password);
+  }
 
   @OneToMany(type => OrderEntity, order => order.user)
   orders: OrderEntity[];
