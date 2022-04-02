@@ -1,0 +1,15 @@
+/.idea
+/dist
+/node_modules
+/sql
+/.env
+/.env.example
+/.eslintrc.js
+/.gitignore
+/.prettierrc
+/docker.env
+/docker.env.example
+/docker-compose.yml
+/Dockerfile
+/product-orders.iml
+/README.md

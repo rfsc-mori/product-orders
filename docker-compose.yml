@@ -9,9 +9,9 @@ services:
     restart: on-failure
     command: >
       bash -c "while !</dev/tcp/db/${DB_PORT}; do sleep 1; done;
-               npm run-script migration:run;
-               npm run-script db:populate;
-               npm start"
+      npm run-script migration:run;
+      npm run-script db:populate;
+      npm run start:prod"
     env_file:
       - docker.env
     ports:
