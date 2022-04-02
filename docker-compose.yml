@@ -13,7 +13,7 @@ services:
       npm run-script db:populate;
       npm run start:prod"
     env_file:
-      - docker.env
+      - .env
     ports:
       - ${APP_PORT}:${APP_PORT}
   db:
@@ -22,7 +22,7 @@ services:
     volumes:
       - mariadb:/var/lib/mariadb
     env_file:
-      - docker.env
+      - .env
     environment:
       MARIADB_RANDOM_ROOT_PASSWORD: yes
       MARIADB_USER: ${DB_USER}

@@ -24,6 +24,23 @@ Clone este repositório:
 $ git clone https://github.com/rfsc-mori/product-orders.git
 ```
 
+## Configuração
+
+Crie um arquivo `.env` baseado no arquivo de exemplo `.env.example`.
+
+As variáveis de ambiente `DB_*` dependem da configuração de seu sistema, por exemplo:
+- DB_HOST: `localhost` ou o endereço onde o servidor de banco de dados espera por conexões;
+- DB_PORT: `3306` ou a porta configurada para o mariadb/mysql;
+- DB_USER: o usuário do banco de dados, preferencialmente com permissões limitadas;
+- DB_PASSWORD: a senha de autenticação para o usuário do banco de dados;
+- DB_NAME: o nome da database/schema que a aplicação usará.
+
+As variáveis `JWT_*` correspondem ao sistema de autenticação de usuário da API:
+- JWT_SECRET: usado para assinar o token de autenticação;
+- JWT_EXPIRES: a duração do token de autenticação, em texto (ex: 60s, 1d).
+
+A variável `APP_PORT` define a porta em que a API receberá conexões, por padrão utiliza a porta `3000`.
+
 ## Via Docker
 
 Execute o comando abaixo e a API estará disponível após a inicialização do container:
@@ -42,23 +59,6 @@ Instale as dependências localmente via npm:
 $ npm install
 ```
 
-## Configuração
-
-Crie um arquivo `.env` baseado no arquivo de exemplo `.env.example`.
-
-As variáveis de ambiente `DB_*` dependem da configuração de seu sistema, por exemplo:
-- DB_HOST: `localhost` ou o endereço onde o servidor de banco de dados espera por conexões;
-- DB_PORT: `3306` ou a porta configurada para o mariadb/mysql;
-- DB_USER: o usuário do banco de dados, preferencialmente com permissões limitadas;
-- DB_PASSWORD: a senha de autenticação para o usuário do banco de dados;
-- DB_NAME: o nome da database/schema que a aplicação usará.
-
-As variáveis `JWT_*` correspondem ao sistema de autenticação de usuário da API:
-- JWT_SECRET: usado para assinar o token de autenticação;
-- JWT_EXPIRES: a duração do token de autenticação, em texto (ex: 60s, 1d).
-
-A variável `APP_PORT` define a porta em que a API receberá conexões, por padrão utiliza a porta `3000`.
-
 ## Preparando
 
 Após finalizar a configuração e salvar o arquivo `.env` execute:
@@ -70,7 +70,7 @@ $ npm run build
 Para preparar o banco de dados, novamente execute o próximo comando:
 
 ```
-$ npm run-script migrate:run
+$ npm run-script migration:run
 ```
 
 ## Importando dados da API do Mercado Livre
