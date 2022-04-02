@@ -66,6 +66,19 @@ export class ProductsService {
     return products.map(ProductsService.buildProductView);
   }
 
+  async consumeProduct(id: string) {
+    const product = await this.getProductEntityById(id);
+
+    if (product.available_quantity < 1) {
+      const errors = {id: 'The specified product is out of stock.'};
+      throw new HttpException({message: 'Resource unavailable.', errors}, HttpStatus.CONFLICT);
+    }
+
+    product.available_quantity -= 1;
+
+    await this.productRepository.save(product);
+  }
+
   private async getProductEntityById(id: string) {
     const product = await this.productRepository.findOne({ id: id });
 

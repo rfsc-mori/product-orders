@@ -44,6 +44,10 @@ export class OrdersService {
 
     await OrdersService.validateOrder(order);
 
+    for (const product of uniqueProducts) {
+      await this.productsService.consumeProduct(product);
+    }
+
     const orderEntity = await this.ordersRepository.save(order);
     return OrdersService.buildOrderView(orderEntity);
   }
