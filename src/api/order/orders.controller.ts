@@ -21,6 +21,13 @@ export class OrdersController {
 
   @UsePipes(new ValidationPipe())
   @UseGuards(JwtAuthGuard)
+  @Get()
+  async orders(@JwtUserData() userData) {
+    return this.ordersService.findProductOrdersView(userData.id);
+  }
+
+  @UsePipes(new ValidationPipe())
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   async order(@JwtUserData() userData, @Param('id') id: number) {
     return this.ordersService.findProductOrdersViewById(userData.id, id);

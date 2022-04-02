@@ -17,6 +17,11 @@ export class OrdersService {
     private readonly productsService: ProductsService,
   ) {}
 
+  async findProductOrdersView(userId: number) {
+    const order = await this.getOrderEntities(userId, ['user', 'products']);
+    return order.map(OrdersService.buildProductOrdersView);
+  }
+
   async findProductOrdersViewById(userId: number, id: number) {
     const order = await this.getOrderEntityById(userId, id, ['user', 'products']);
     return OrdersService.buildProductOrdersView(order);
@@ -66,6 +71,15 @@ export class OrdersService {
       user: UsersService.buildShortUserView(order.user),
       products: order.products.map(ProductsService.buildShortProductView),
     };
+  }
+
+  private async getOrderEntities(userId: number, relations?: string[]) {
+    await this.usersService.ensureUserExistsById(userId);
+
+    return this.ordersRepository.find({
+      where: { userId: userId },
+      relations: relations
+    });
   }
 
   private async getOrderEntityById(userId: number, id: number, relations?: string[]) {
