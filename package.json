@@ -19,9 +19,9 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "typeorm": "ts-node ./node_modules/typeorm/cli -f ./ormconfig.json",
-    "migration:gen": "ts-node ./node_modules/typeorm/cli -f ./ormconfig.json migration:generate -d ./src/migrations -n",
-    "migration:run": "ts-node ./node_modules/typeorm/cli -f ./ormconfig.json migration:run",
+    "typeorm": "ts-node ./node_modules/typeorm/cli -f ormconfig.js",
+    "migration:gen": "ts-node ./node_modules/typeorm/cli -f ormconfig.js migration:generate -d ./src/migrations -n",
+    "migration:run": "ts-node ./node_modules/typeorm/cli -f ormconfig.js migration:run",
     "db:populate": "CLI_PATH=./dist/cli.js npx nestjs-command db:populate"
   },
   "dependencies": {
@@ -36,7 +36,6 @@
     "argon2": "^0.28.5",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2",
-    "js-yaml": "^4.1.0",
     "jsonwebtoken": "^8.5.1",
     "mysql2": "^2.3.3",
     "nestjs-command": "^3.1.1",
@@ -58,7 +57,6 @@
     "@nestjs/testing": "^8.0.0",
     "@types/express": "^4.17.13",
     "@types/jest": "27.4.1",
-    "@types/js-yaml": "^4.0.5",
     "@types/node": "^16.0.0",
     "@types/passport-jwt": "^3.0.6",
     "@types/passport-local": "^1.0.34",

@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  backend:
+    container_name: po_backend
+    depends_on:
+      - db
+    build: .
+    restart: on-failure
+    command: >
+      bash -c "while !</dev/tcp/db/${DB_PORT}; do sleep 1; done;
+               npm run-script migration:run;
+               npm run-script db:populate;
+               npm start"
+    env_file:
+      - docker.env
+    ports:
+      - ${APP_PORT}:${APP_PORT}
+  db:
+    image: mariadb
+    container_name: po_db
+    volumes:
+      - mariadb:/var/lib/mariadb
+    env_file:
+      - docker.env
+    environment:
+      MARIADB_RANDOM_ROOT_PASSWORD: yes
+      MARIADB_USER: ${DB_USER}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+      MARIADB_DATABASE: ${DB_NAME}
+    ports:
+      - ${DB_PORT}:3306
+
+volumes:
+  mariadb:

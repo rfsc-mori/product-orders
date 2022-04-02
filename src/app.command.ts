@@ -42,7 +42,7 @@ export class AppCommand {
     apiURL: string
   ) {
     if (await this.categoriesService.count() > 0 || await this.productsService.count() > 0) {
-      console.error('Error: Cannot import categories and products into a non-empty database.');
+      console.log('populateDatabase: The database is not empty, skipping.');
       return;
     }
 

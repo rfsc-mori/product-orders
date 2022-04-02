@@ -1,8 +1,6 @@
 # local configurations
 /.env
-/ormconfig.json
-/config/config.yaml
-/config/auth.config.yaml
+/docker.env
 
 # compiled output
 /dist
