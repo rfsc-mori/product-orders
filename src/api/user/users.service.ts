@@ -3,7 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { UserEntity } from "./user.entity";
 import { CreateUserDto } from "./dto";
-import { UserView } from "./user.interface";
+import { ShortUserView, UserView } from "./user.interface";
 
 import { validate } from "class-validator";
 
@@ -50,7 +50,7 @@ export class UsersService {
   async create(userDto: CreateUserDto) {
     if (await this.userExistsByEmail(userDto.email)) {
       const errors = {email: 'The email must be unique.'};
-      throw new HttpException({message: 'Input data validation failed.', errors}, HttpStatus.CONFLICT);
+      throw new HttpException({message: 'Resource already exists.', errors}, HttpStatus.CONFLICT);
     }
 
     let user = new UserEntity();
@@ -66,7 +66,7 @@ export class UsersService {
     return UsersService.buildUserView(userEntity);
   }
 
-  async getUserEntityById(id: number) {
+  private async getUserEntityById(id: number) {
     const user = await this.usersRepository.findOne({ id: id });
 
     if (!user) {
@@ -77,11 +77,17 @@ export class UsersService {
     return user;
   }
 
-  public static buildUserView(user: UserEntity): UserView {
+  static buildUserView(user: UserEntity): UserView {
     return {
       id: user.id,
       name: user.name,
       email: user.email,
+    };
+  }
+
+  static buildShortUserView(user: UserEntity): ShortUserView {
+    return {
+      name: user.name,
     };
   }
 

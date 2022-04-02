@@ -4,3 +4,9 @@ export interface ProductView {
   price: number;
   available_quantity: number;
 }
+
+export interface ShortProductView {
+  id: string;
+  title: string;
+  price: number;
+}

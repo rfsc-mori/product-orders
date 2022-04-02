@@ -47,7 +47,7 @@ export class CategoriesService {
     return this.categoryRepository.save(category);
   }
 
-  public static buildCategoryView(category: CategoryEntity): CategoryView {
+  static buildCategoryView(category: CategoryEntity): CategoryView {
     return {
       id: category.id,
       name: category.name,
@@ -66,7 +66,7 @@ export class CategoriesService {
     const categories = await this.categoryRepository.find({ name: In(names) });
 
     if (categories.length < names.length) {
-      const errors = {id: 'One or more of the specified categories don\'t exist.'};
+      const errors = {id: 'One or more of the specified categories do not exist.'};
       throw new HttpException({message: 'Resource not found.', errors}, HttpStatus.NOT_FOUND);
     }
 

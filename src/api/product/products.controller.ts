@@ -13,7 +13,7 @@ export class ProductsController {
   async products(@Query('category_id') categoryId: string) {
     if (!categoryId || categoryId.length == 0) {
       const errors = {category_id: 'The category id cannot be empty.'};
-      throw new HttpException({message: 'Failed to list products.', errors}, HttpStatus.BAD_REQUEST);
+      throw new HttpException({message: 'Input data validation failed.', errors}, HttpStatus.BAD_REQUEST);
     }
 
     return this.productsService.findViewsByCategory(categoryId);
@@ -24,7 +24,7 @@ export class ProductsController {
   async product(@Query('id') id: string) {
     if (!id || id.length == 0) {
       const errors = {id: 'The product id cannot be empty.'};
-      throw new HttpException({message: 'Failed to list products.', errors}, HttpStatus.BAD_REQUEST);
+      throw new HttpException({message: 'Input data validation failed.', errors}, HttpStatus.BAD_REQUEST);
     }
 
     return this.productsService.findViewById(id);
@@ -35,7 +35,7 @@ export class ProductsController {
   async prices(@Param('categoryId') categoryId: string) {
     if (!categoryId || categoryId.length == 0) {
       const errors = {categoryId: 'The category id cannot be empty.'};
-      throw new HttpException({message: 'Failed to list products.', errors}, HttpStatus.BAD_REQUEST);
+      throw new HttpException({message: 'Input data validation failed.', errors}, HttpStatus.BAD_REQUEST);
     }
 
     return this.productsService.findViewsByCategory(categoryId, { price: 'ASC' });

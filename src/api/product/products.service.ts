@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from "@nestjs/typeorm";
 import { In, Repository } from "typeorm";
 import { ProductEntity } from "./product.entity";
-import { ProductView } from "./product.interface";
+import { ProductView, ShortProductView } from "./product.interface";
 import { CreateProductDto } from "./dto";
 import { CategoriesService } from "../category/categories.service";
 
@@ -27,7 +27,7 @@ export class ProductsService {
 
   async ensureProductsExistsById(ids: string[]) {
     if (!await this.productsExists(ids)) {
-      const errors = {id: 'The specified product does not exist.'};
+      const errors = {id: 'One or more of the specified products do not exist.'};
       throw new HttpException({message: 'Resource not found.', errors}, HttpStatus.NOT_FOUND);
     }
   }
@@ -66,7 +66,7 @@ export class ProductsService {
     return products.map(ProductsService.buildProductView);
   }
 
-  async getProductEntityById(id: string) {
+  private async getProductEntityById(id: string) {
     const product = await this.productRepository.findOne({ id: id });
 
     if (!product) {
@@ -91,12 +91,20 @@ export class ProductsService {
     return this.productRepository.save(product);
   }
 
-  public static buildProductView(product: ProductEntity): ProductView {
+  static buildProductView(product: ProductEntity): ProductView {
     return {
       id: product.id,
       title: product.title,
       price: product.price,
       available_quantity: product.available_quantity,
+    };
+  }
+
+  static buildShortProductView(product: ProductEntity): ShortProductView {
+    return {
+      id: product.id,
+      title: product.title,
+      price: product.price,
     };
   }
 

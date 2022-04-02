@@ -3,3 +3,7 @@ export interface UserView {
   name: string;
   email: string;
 }
+
+export interface ShortUserView {
+  name: string;
+}
